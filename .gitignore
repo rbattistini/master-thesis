@@ -299,3 +299,32 @@ TSWLatexianTemp*
 # option is specified. Footnotes are the stored in a file with suffix Notes.bib.
 # Uncomment the next line to have this generated file ignored.
 #*Notes.bib
+
+# precommits by devenv.sh
+.pre-commit-config.yaml
+.devenv
+.direnv
+
+build
+
+# devenv.sh specific
+.devenv/
+.devenv.flake.nix
+.devenv.lock
+
+# Nix/NixOS artifacts
+result
+result-*
+*.gcno
+*.gcda
+.direnv/
+.envrc
+
+### VSCode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.vscode/ipch/
+*.code-workspace

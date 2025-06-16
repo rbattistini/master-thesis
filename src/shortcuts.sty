@@ -1,0 +1,26 @@
+\newcommand{\unibo}{ALMA MATER STUDIORUM -- UNIVERSITÀ DI BOLOGNA}
+
+\newcommand{\BibTeX}{B\kern-.05em{\sc i\kern-.025em b}\kern-.08em\TeX}
+
+\newcommand{\jakta}{JaKtA}
+\newcommand{\alchemist}{Alchemist}
+\newcommand{\agentspeak}{AgentSpeak(L)}
+\newcommand{\jason}{Jason}
+\newcommand{\jacamo}{JaCaMo}
+\newcommand{\disi}{Department of Computer Science and Engineering}
+
+\newcommand{\inlineAsl}[1]{\texttt{#1}}
+
+% FIX: https://tex.stackexchange.com/questions/735500/problem-with-amsmath-cleveref-acronym
+\makeatletter
+\AtBeginDocument
+ {
+   \def\ltx@label#1{\cref@label{#1}}%add braces
+   \def\label@in@display@noarg#1{\cref@old@label@in@display{#1}}%remove braces
+\def\label@in@mmeasure@noarg#1{%
+    \begingroup%
+      \measuring@false%
+      \cref@old@label@in@display{#1}%remove braces for multline, see https://tex.stackexchange.com/q/737204/2388
+    \endgroup}%
+ } %
+\makeatother

@@ -1,0 +1,41 @@
+\usepackage{listings}
+\usepackage{xcolor}
+
+%-----------------------------------------------------
+% LISTING CONFIGURATIONS
+%-----------------------------------------------------
+
+\crefname{lstlisting}{listing}{listing}	
+\Crefname{lstlisting}{Listing}{Listing}
+\renewcommand\lstlistlistingname{List of Listings}
+
+\lstset{
+	showstringspaces=false,
+	basicstyle=\scriptsize\ttfamily,
+	commentstyle={\color{olive}},
+	identifierstyle=\color{black},
+	ndkeywordstyle={\color{blue}},
+	stringstyle={\color{magenta}},
+	emphstyle={},
+	keywordstyle={\color{blue}},
+	breaklines=true,
+	numbers=none,
+	numberstyle=\tiny\color{gray},
+	numbersep=10pt,
+	tabsize=2,
+	extendedchars=true,
+	frame=single,
+	frameround=fttt,
+    escapeinside={(*@}{@*)},
+}
+
+\lstdefinelanguage{Kotlin}{
+    comment=[l]{//},
+    emph={delegate, filter, filterIsInstance, flatMap, toSet, firstOrNull, forEach, lazy, map, mapNotNull, println, return@, sequence, yield, Array, Byte, Double, Float, Int, Iterable, Long, Runnable, Short, String},
+    keywords={operator, infix, init, abstract, actual, as, as?, break, by, class, companion, continue, data class, do, dynamic, else, enum, expect, false, final, for, fun, get, if, import, in, interface, internal, is, null, object, override, package, private, public, return, set, super, suspend, this, throw, true, try, typealias, val, var, vararg, when, where, while, it},
+    morecomment=[s]{/*}{*/},
+    morestring=[b]",
+    morestring=[s]{"""}{"""},
+    ndkeywords={@Deprecated, @JvmField, @JvmName, @JvmOverloads, @JvmStatic, @JvmSynthetic},
+    sensitive=true,
+}
