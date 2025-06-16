@@ -680,12 +680,10 @@ Similarly, the admissible belief \inlineAsl{there\_is(Obj, Dir)} could be descri
 Likewise, this applies to every admissible/current goal, belief, or action.
 
 \note{
-    Taking as reference~\cite{tamLetMeSpeak2024}, three main approaches can be considered for getting structured outputs out of a \ac{LLM}: 
-    \begin{inlinelist}
-        \item constrained generation techniques, based on CF grammars (i.e.\ JSON mode) or regexes, as seen in~\cite{willardEfficientGuidedGeneration2023};
-        \item format restricting instructions, which nudges the \ac{LLM} to generate responses in standardized formats, such JSON, XML and YAML;
-        \item NL-to-format: in which the \ac{LLM} is first instructed to answer the question in natural language, and then to convert its response into the target format schema.
-    \end{inlinelist}
+    Taking as reference~\cite{tamLetMeSpeak2024}, three main approaches can be considered for getting structured outputs out of a \ac{LLM} 
+    -constrained generation techniques, based on CF grammars (i.e.\ JSON mode) or regexes, as seen in~\cite{willardEfficientGuidedGeneration2023};
+    - format restricting instructions, which nudges the \ac{LLM} to generate responses in standardized formats, such JSON, XML and YAML;
+    - NL-to-format: in which the \ac{LLM} is first instructed to answer the question in natural language, and then to convert its response into the target format schema.
     %
     The choice took into consideration the inherent trade-off between output structure compliance and generation performance~\cite{tamLetMeSpeak2024}.
     %
@@ -1083,25 +1081,23 @@ For~\ref{rq:reusability}, the methodology outlined in this work shows promise fo
 
 \note{
     To consider:
-    \begin{itemize}
-        \item Artifacts as Tools
-        \item Expressing plans in a controlled natural language
-        \item Leveraging ontologies to ease knowledge transfer
-        \item Modularization of the deliberation cycle
-        \item Integration with MCP and RAG
-        \item Runtime validation and verification mechanisms
-        \item Plan repair, failure learning and adaptive refinement
-        \item Plan selection
-        \item Plan and goal recognition
-        \item Fine-tuning and Alignment of LMs: Despite the performance of SLM seems very low from preliminary results, fine-tuning and alignment have generally proved itself as a very powerful approach to boost the performance of SLM (missing citation).
+    - Artifacts as Tools
+        - Expressing plans in a controlled natural language
+        - Leveraging ontologies to ease knowledge transfer
+        - Modularization of the deliberation cycle
+        - Integration with MCP and RAG
+        - Runtime validation and verification mechanisms
+        - Plan repair, failure learning and adaptive refinement
+        - Plan selection
+        - Plan and goal recognition
+        - Fine-tuning and Alignment of LMs: Despite the performance of SLM seems very low from preliminary results, fine-tuning and alignment have generally proved itself as a very powerful approach to boost the performance of SLM (missing citation).
         %
         Also add survey of alignment techniques like RLFH, DPO, PPO and GRPO~\cite{wangComprehensiveSurveyLLM2024}. 
         %
         May also add SFT, PEFT, LoRA.\@
-        \item Test Time Scaling: search algorithms and verification~\cite{zhangSurveyTestTimeScaling2025}
-        \item More complex testing scenarios
-        \item User studies: how the BDI agent programmer might benefit from this?
-    \end{itemize}
+        - Test Time Scaling: search algorithms and verification~\cite{zhangSurveyTestTimeScaling2025}
+        - More complex testing scenarios
+        - User studies: how the BDI agent programmer might benefit from this?
 }
 
 \note{
