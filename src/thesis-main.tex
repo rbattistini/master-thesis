@@ -794,17 +794,29 @@ In table~\ref{pgp-params} an outline of the configuration that the user can prov
 \begin{table}[htbp]
 \centering
 \begin{tabular}{|l|l|p{7cm}|}
+\hline
 \textbf{Parameter} & \textbf{Type} & \textbf{Description} \\
+\hline
 \texttt{model} & \texttt{String} & Specifies the language model to be used for plan generation (e.g., GPT-4, Claude, etc.) \\
+\hline
 \texttt{temperature} & \texttt{Double} & Controls the randomness of the generated output. Lower values produce more deterministic results, higher values increase creativity \\
+\hline
 \texttt{maxTokens} & \texttt{Int} & Maximum number of tokens that can be generated in the response, limiting the length of generated plans \\
+\hline
 \texttt{url} & \texttt{String} & The endpoint URL for the language model API service \\
+\hline
 \texttt{token} & \texttt{String} & Authentication token required to access the language model API \\
+\hline
 \texttt{requestTimeout} & \texttt{Duration} & Maximum time to wait for a complete API request-response cycle \\
+\hline
 \texttt{connectTimeout} & \texttt{Duration} & Maximum time to wait when establishing a connection to the API service \\
+\hline
 \texttt{socketTimeout} & \texttt{Duration} & Maximum time to wait for data transfer over an established connection \\
+\hline
 \texttt{contextFilter} & \texttt{ContextFilter} & Filter component that determines which contextual information should be included in the generation prompt \\
+\hline
 \texttt{promptBuilder} & \texttt{PromptBuilder} & Component responsible for constructing the prompt sent to the language model, including context formatting and instruction generation \\
+\bottomrule
 \end{tabular}
 \caption{Configurable Parameters for the \ac{PGP}.}
 \label{pgp-params}
