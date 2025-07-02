@@ -1,0 +1,29 @@
+@startuml
+hide empty members
+
+interface EnvironmentChange
+
+class SpawnAgent
+
+SpawnAgent .u..|> EnvironmentChange
+
+class RemoveAgent implements EnvironmentChange
+
+class SendMessage
+
+SendMessage .u..|> EnvironmentChange
+
+class BroadcastMessage implements EnvironmentChange
+
+class PopMessage
+
+PopMessage .u..|> EnvironmentChange
+
+class AddData implements EnvironmentChange
+
+class RemoveData
+
+RemoveData .u..|> EnvironmentChange
+
+class UpdateData implements EnvironmentChange
+@enduml

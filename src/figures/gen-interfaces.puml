@@ -1,0 +1,33 @@
+@startuml
+hide empty members
+
+left to right direction
+
+interface Generator
+
+interface LMGenerator extends Generator
+
+interface LMPlanGenerator extends LMGenerator
+
+interface GenerationStrategy
+
+interface LMGenerationStrategy extends GenerationStrategy
+
+interface GenerationResult
+
+interface PlanGenerationResult extends GenerationResult
+
+interface GenerationFailureResult extends GenerationResult
+
+class LMGenerationFailure implements GenerationFailureResult
+
+class LMGenerationResult implements PlanGenerationResult
+
+interface GenerationConfig
+
+interface LMGenerationConfig extends GenerationConfig
+
+interface GenerationState
+
+class LMGenerationState implements GenerationState
+@enduml

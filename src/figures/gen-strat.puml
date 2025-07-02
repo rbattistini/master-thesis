@@ -1,0 +1,24 @@
+@startuml
+hide empty members
+interface LMGenerationStrategy
+
+class LMGenerationStrategyImpl
+
+class LMPlanGenerator
+
+class RequestHandler
+
+class RequestProcessor
+
+class Parser
+
+class OpenAIApi
+
+LMGenerationStrategyImpl ..|> LMGenerationStrategy
+
+LMGenerationStrategyImpl --* LMPlanGenerator
+LMPlanGenerator --* RequestHandler
+LMPlanGenerator --* Parser
+RequestHandler --* OpenAIApi
+RequestHandler --* RequestProcessor
+@enduml

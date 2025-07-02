@@ -1,0 +1,30 @@
+@startuml
+hide empty members
+
+interface GenerationStrategy
+interface GeneratePlanStrategy
+
+GeneratePlanStrategy -->  GenerationStrategy
+
+class GeneratePlanStrategyImpl implements GeneratePlanStrategy
+
+interface GenerationResultBuilder
+interface PlanGenerationResult
+
+interface GenerationProcessRegistry
+
+GenerationProcessUpdater --> GenerationProcessRegistry
+GenerationResultBuilder --> PlanGenerationResult
+GeneratePlanStrategyImpl *-- GenerationResultBuilder
+
+interface Updater
+
+class PlanLibraryUpdater implements Updater
+class TemplateUpdater implements Updater
+class GenerationProcessUpdater implements Updater
+class GenerationResultBuilderImpl implements GenerationResultBuilder
+
+GenerationResultBuilderImpl *-- PlanLibraryUpdater
+GenerationResultBuilderImpl *-- TemplateUpdater
+GenerationResultBuilderImpl *-- GenerationProcessUpdater
+@enduml

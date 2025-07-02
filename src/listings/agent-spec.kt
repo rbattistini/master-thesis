@@ -1,4 +1,4 @@
-agent("ExplorerBot") {
+agent("ExplorerRobot") {
   goals {
       admissible {
           +achieve("reach"("Object")).meaning {

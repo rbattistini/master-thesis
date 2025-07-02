@@ -10,32 +10,51 @@
 \renewcommand\lstlistlistingname{List of Listings}
 
 \lstset{
-	showstringspaces=false,
-	basicstyle=\scriptsize\ttfamily,
-	commentstyle={\color{olive}},
-	identifierstyle=\color{black},
-	ndkeywordstyle={\color{blue}},
-	stringstyle={\color{magenta}},
-	emphstyle={},
-	keywordstyle={\color{blue}},
-	breaklines=true,
-	numbers=none,
-	numberstyle=\tiny\color{gray},
-	numbersep=10pt,
-	tabsize=2,
-	extendedchars=true,
-	frame=single,
-	frameround=fttt,
+    showstringspaces=false,
+    basicstyle=\footnotesize\ttfamily,
+    keywordstyle=\color{blue}\bfseries,
+    ndkeywordstyle=\color{teal},
+    identifierstyle=\color{black},
+    stringstyle=\color{purple},
+    commentstyle=\color{gray}\itshape,
+    emphstyle=\color{violet},
+    breaklines=true,
+    breakatwhitespace=true,
+    tabsize=2,
+    frame=single,
+    frameround=tttt,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    numbersep=10pt,
     escapeinside={(*@}{@*)},
+    columns=fullflexible,
+    extendedchars=true,
+    literate={∞}{{$\infty$}}1 {→}{{$\rightarrow$}}1,
 }
 
+
 \lstdefinelanguage{Kotlin}{
-    comment=[l]{//},
-    emph={delegate, filter, filterIsInstance, flatMap, toSet, firstOrNull, forEach, lazy, map, mapNotNull, println, return@, sequence, yield, Array, Byte, Double, Float, Int, Iterable, Long, Runnable, Short, String},
-    keywords={operator, infix, init, abstract, actual, as, as?, break, by, class, companion, continue, data class, do, dynamic, else, enum, expect, false, final, for, fun, get, if, import, in, interface, internal, is, null, object, override, package, private, public, return, set, super, suspend, this, throw, true, try, typealias, val, var, vararg, when, where, while, it},
+    morekeywords={
+        abstract, actual, annotation, as, as?, break, by, catch, class, companion, const,
+        constructor, continue, crossinline, delegate, do, dynamic, else, enum, expect, external,
+        false, field, final, finally, for, fun, get, if, import, in, infix, init, inline, inner,
+        interface, internal, is, it, lateinit, noinline, null, object, open, operator, out,
+        override, package, param, private, property, protected, public, reified, return, sealed,
+        set, super, suspend, tailrec, this, throw, true, try, typealias, typeof, val, var,
+        vararg, when, where, while, yield
+    },
+    morecomment=[l]{//},
     morecomment=[s]{/*}{*/},
     morestring=[b]",
     morestring=[s]{"""}{"""},
-    ndkeywords={@Deprecated, @JvmField, @JvmName, @JvmOverloads, @JvmStatic, @JvmSynthetic},
     sensitive=true,
+    emph={
+        println, print, map, flatMap, filter, fold, forEach, takeIf, let, also, apply, run,
+        with, use, lazy, toList, toSet, toMap, firstOrNull, sequence, yield, Array, List, Set,
+        Map, String, Int, Long, Float, Double, Boolean, Char, Byte, Short
+    },
+    ndkeywords={
+        @Deprecated, @JvmField, @JvmName, @JvmOverloads, @JvmStatic, @JvmSynthetic,
+        @Inject, @Provides, @Module, @Singleton, @Component, @Binds, @OptIn
+    }
 }

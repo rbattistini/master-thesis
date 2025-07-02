@@ -1,0 +1,35 @@
+@startuml
+hide empty members
+
+interface LogEvent
+
+interface EnvironmentEvent extends LogEvent
+
+interface EnvironmentChange extends EnvironmentEvent
+
+interface AgentEvent extends LogEvent
+
+interface PlanGenProcedureEvent extends AgentEvent
+
+interface AgentChange
+
+AgentChange --u-|> AgentEvent
+
+interface BdiEvent extends AgentEvent
+
+interface IntentionEvent
+
+IntentionEvent --u-|> AgentEvent
+
+interface GoalEvent extends AgentEvent
+
+interface MessageEvent
+
+MessageEvent --u-|> AgentEvent
+
+interface PlanEvent extends AgentEvent
+
+interface ActionEvent
+
+ActionEvent --u-|> AgentEvent
+@enduml

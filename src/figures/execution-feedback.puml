@@ -1,0 +1,33 @@
+@startuml
+hide empty members
+
+interface ExecutionFeedback
+
+interface NegativeFeedback extends ExecutionFeedback
+
+interface GoalFailure extends NegativeFeedback
+
+class InvalidActionArityError
+
+InvalidActionArityError .u..|> GoalFailure
+
+class ActionSubstituionFailure implements GoalFailure
+
+class ActionNotFound
+
+ActionNotFound .u..|> GoalFailure
+
+class ActionFailure implements GoalFailure
+
+class TestGoalFailureFeedback
+
+TestGoalFailureFeedback .u..|> GoalFailure
+
+interface PositiveFeedback extends ExecutionFeedback
+
+interface GoalSuccess extends PositiveFeedback
+
+class GoalExecutionSuccess implements GoalSuccess
+
+class ActionSuccess implements GoalSuccess
+@enduml

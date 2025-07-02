@@ -1,0 +1,26 @@
+@startuml
+start
+:Goal addition/deletion;
+:Find applicable plans;
+
+if (Plan found?) then (yes)
+
+else (no)
+  :Invoke PGP;
+  if (PGP succeeded?) then (yes)
+    :Add plans to Plan Library;
+  else (no)
+    :Goal Failed;
+    stop
+  endif
+endif
+
+:Push plan into intentions;
+:Process Intentions;
+if (Plan executed?) then (yes)
+  :Goal Achieved;
+else (no)
+  :Goal Failed;
+endif
+stop
+@enduml

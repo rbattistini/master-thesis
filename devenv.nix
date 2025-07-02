@@ -10,6 +10,5 @@
   enterShell = ''
     just --version
     tectonic --version
-    just start
   '';
 }

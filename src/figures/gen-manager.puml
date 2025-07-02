@@ -1,0 +1,30 @@
+@startuml
+hide empty members
+
+interface GenerationManager
+
+interface GoalTrackingStrategy
+
+interface UnavailablePlanStrategy
+
+interface GeneratePlanStrategy
+
+interface GenerationStrategy
+
+interface PartialPlan
+
+interface GeneratePlan
+
+GeneratePlanStrategy -->  GenerationStrategy
+
+GeneratePlanStrategy -->  PartialPlan
+
+GeneratePlanStrategy -->  GeneratePlan
+
+GenerationManager <-- GoalTrackingStrategy
+GenerationManager <-- UnavailablePlanStrategy
+GenerationManager <-- GeneratePlanStrategy
+
+interface InvalidationStrategy
+GoalTrackingStrategy <-- InvalidationStrategy
+@enduml

@@ -1,0 +1,12 @@
+@startuml
+hide empty members
+interface RequestResult
+
+interface RequestFailure implements RequestResult
+
+interface RequestSuccess implements RequestResult
+
+class NewRequestResult extends RequestSuccess
+
+class NetworkRequestFailure extends RequestFailure
+@enduml

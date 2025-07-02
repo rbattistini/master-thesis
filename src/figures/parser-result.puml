@@ -1,0 +1,26 @@
+@startuml
+hide empty members
+interface ParserResult
+
+class GenericParseFailure
+
+GenericParseFailure ...|> ParserFailure
+
+class AdmissibleGoalParseFailure
+
+class AdmissibleBeliefParseFailure implements ParserFailure
+
+AdmissibleGoalParseFailure ..|> ParserFailure
+
+PlanParseFailure ..|> ParserFailure
+
+class PlanParseFailure 
+
+class EmptyResponse implements ParserFailure
+
+interface ParserSuccess extends ParserResult
+
+class NewResult implements ParserSuccess
+
+interface ParserFailure extends ParserResult
+@enduml

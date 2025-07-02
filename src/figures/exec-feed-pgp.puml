@@ -1,0 +1,19 @@
+@startuml
+hide empty members
+
+interface ExecutionFeedback
+
+interface NegativeFeedback extends ExecutionFeedback
+
+interface PositiveFeedback extends ExecutionFeedback
+
+interface PGPFailure extends NegativeFeedback
+
+class GenericGenerationFailure implements PGPFailure
+
+interface PGPSuccess extends PositiveFeedback
+
+class GenerationRequested implements PGPSuccess
+
+class GenerationCompleted implements PGPSuccess
+@enduml

@@ -1,0 +1,41 @@
+@startuml
+hide empty members
+
+interface AgentEvent
+
+interface PlanGenProcedureEvent extends AgentEvent
+
+class LMMessageSent implements PlanGenProcedureEvent
+
+class LMMessageReceived 
+
+LMMessageReceived ..u.|> PlanGenProcedureEvent
+
+class LMGenerationRequested implements PlanGenProcedureEvent
+
+interface AgentChange extends AgentEvent
+
+interface InternalChange extends AgentChange
+
+class BeliefChange
+
+BeliefChange ..u.|> InternalChange
+
+class IntentionChange implements InternalChange
+
+class EventChange
+
+EventChange ..u.|> InternalChange
+
+class PlanChange implements InternalChange
+
+interface ActivityChange extends AgentChange
+
+class Sleep implements ActivityChange
+
+class Stop
+
+Stop ..u.|> ActivityChange
+
+class Pause implements ActivityChange
+@enduml
