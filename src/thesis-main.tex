@@ -139,7 +139,7 @@ Specifically, a \ac{BDI} agent~\cite{RaoG95}:
 
 Several architectures have been proposed to implement \ac{BDI} agents in software, including \agentspeak{}~\cite{RaoG95}, \ac{PRS}~\cite{IngrandGR1992}, and \ac{dMARS}~\cite{DInvernoLGKW04}.
 %
-For an account of the many architectures proposed in the literature refer to the survey by Meneguzzi and de Silva~\cite{silvaBDIAgentArchitectures2020} .
+For an account of the many architectures proposed in the literature refer to the survey by Meneguzzi and de Silva~\cite{silvaBDIAgentArchitectures2020}.
 %
 In the following, the focus is on the widely-adopted \agentspeak{}---so that the terms \ac{BDI} agents and \agentspeak{} agents may be used interchangeably from now on.
 
@@ -252,7 +252,7 @@ The previous section surfaced the main differences between \ac{BDI} plans and cl
 \begin{inlinelist}
     \item \ac{BDI} plans and goals are procedural, while in classical planning they are declarative~\cite{winikoff2002kr};
     \item \ac{BDI} actions have no clearly stated pre- and post-conditions, while classical planning actions are defined by them
-    \item \label{item:diff-subgoals} \ac{BDI} plans can include subgoals for a more flexible execution flow, while classical planning is usually assembling a linear sequence of actions to move from one world state to another.
+    \item\label{item:diff-subgoals} \ac{BDI} plans can include subgoals for a more flexible execution flow, while classical planning is usually assembling a linear sequence of actions to move from one world state to another.
 \end{inlinelist}
 %
 \ac{HTN} planning~\cite{georgievski2015ai}, based on the idea of task decomposition, allows generating more abstract plans that can mimic the invocation of subgoals and thus addressing~\cref{item:diff-subgoals}.
@@ -794,29 +794,17 @@ In table~\ref{pgp-params} an outline of the configuration that the user can prov
 \begin{table}[htbp]
 \centering
 \begin{tabular}{|l|l|p{7cm}|}
-\hline
 \textbf{Parameter} & \textbf{Type} & \textbf{Description} \\
-\hline
 \texttt{model} & \texttt{String} & Specifies the language model to be used for plan generation (e.g., GPT-4, Claude, etc.) \\
-\hline
 \texttt{temperature} & \texttt{Double} & Controls the randomness of the generated output. Lower values produce more deterministic results, higher values increase creativity \\
-\hline
 \texttt{maxTokens} & \texttt{Int} & Maximum number of tokens that can be generated in the response, limiting the length of generated plans \\
-\hline
 \texttt{url} & \texttt{String} & The endpoint URL for the language model API service \\
-\hline
 \texttt{token} & \texttt{String} & Authentication token required to access the language model API \\
-\hline
 \texttt{requestTimeout} & \texttt{Duration} & Maximum time to wait for a complete API request-response cycle \\
-\hline
 \texttt{connectTimeout} & \texttt{Duration} & Maximum time to wait when establishing a connection to the API service \\
-\hline
 \texttt{socketTimeout} & \texttt{Duration} & Maximum time to wait for data transfer over an established connection \\
-\hline
 \texttt{contextFilter} & \texttt{ContextFilter} & Filter component that determines which contextual information should be included in the generation prompt \\
-\hline
 \texttt{promptBuilder} & \texttt{PromptBuilder} & Component responsible for constructing the prompt sent to the language model, including context formatting and instruction generation \\
-\hline
 \end{tabular}
 \caption{Configurable Parameters for the \ac{PGP}.}
 \label{pgp-params}
@@ -951,7 +939,7 @@ It handles the initial setup and delegates the actual generation request to a ch
 %
 It then uses the \texttt{GenerationResultBuilder} interface to construct \\ \texttt{PlanGenerationResult}s from successful plan generations, that can be integrated transparently into the \ac{BDI} engine.
 %
-Each of the three \texttt{Updater}s within the \texttt{GenerationResultBuilder} handles a specific aspect of integrating the generated content into the agent's context.
+Each of the three \texttt{Updater}s within the result builder handles a specific aspect of integrating the generated content into the agent's context.
 
 \begin{figure}
     \centering
@@ -1622,7 +1610,9 @@ The average amount of output tokens is 223, with a min of 77 and a max of 553.
 %
 The average latency of the responses from OpenRouter was of 1471 ms, with a min of 288 ms and a max of 6120 ms.
 %
-The cost to run the experiments was approximately of one USD. Note that Deepseek was offered free of charge.
+The cost to run the experiments was approximately of one USD.
+%
+Note that Deepseek was offered free of charge.
 
 Only in eight instances more than one PGP was invoked, and it never resulted in plans that reached home.
 %
@@ -1712,7 +1702,7 @@ For what concerns this work, the choice of using YAML prioritizes the integratio
 %
 The sense-reason-act cycle of a BDI agent  could be further decomposed into pluggable components to support dynamic composition and substitution of agent functionalities through external modules. 
 %
-This approach would enable users to define in a declarative way how an agent's cognitive cycle is composed as part of its specification, e.g. what component to use for plan selection or for running intentions.
+This approach would enable users to define in a declarative way how an agent's cognitive cycle is composed as part of its specification, e.g.\ what component to use for plan selection or for running intentions.
 %
 This modular architecture would make it easier to separate all plan generation functions from the BDI engine.
 %
@@ -1778,11 +1768,11 @@ This would also support a more declarative, open-ended, and cognitively rich mod
 
 \chapter*{Acknowledgements}
 
-I would like to thank  Prof. Giovanni Ciatto and Prof. Gianluca Aguzzi, for their guidance and support throughout this thesis.
+I would like to thank mu supervisor Giovanni Ciatto and cosupervisor Gianluca Aguzzi, for their guidance and support throughout this thesis.
 %
 I am also thankful to the doctoral candidates Martina Baiardi and Samuele Burattini for their suggestions and feedback, which helped shape the research direction.
 %
-Additional thanks go to Prof. Alessandro Ricci for his insightful input during our group meetings.
+Additional thanks go to Professor Alessandro Ricci for his insightful input during our group meetings.
 
 Last but not least, I want to thank my family for their support, patience, and encouragement throughout this master's program.
 
