@@ -9,7 +9,8 @@
 \usepackage{subcaption}
 \usepackage{graphicx}
 \usepackage{tabularx}
-\usepackage{booktabs} 
+\usepackage{booktabs}
+\usepackage{float}
 \usepackage[
     backref=true,
     backend=biber,
@@ -56,6 +57,18 @@ The framework is implemented using the \jakta{} \acs{BDI} interpreter, and the q
 %----------------------------------------------------------------------------------------
 
 \mainmatter%
+
+\chapter*{Acknowledgements}
+
+I would like to thank my supervisor Giovanni Ciatto and co-supervisor Gianluca Aguzzi, for their guidance and support throughout this thesis.
+%
+I am also thankful to the doctoral candidates Martina Baiardi and Samuele Burattini for their suggestions and feedback, which helped shape the research direction.
+%
+Additional thanks go to Professor Alessandro Ricci for his insightful input during our group meetings.
+%
+I am grateful for the opportunity to collaborate with them on a paper, based on the thesis idea presented here, that is currently under submission to the ECAI 2025 conference.
+
+Last but not least, I want to thank my family for their support, patience, and encouragement throughout this master's program.
 
 \chapter{Introduction}\label{chap:introduction}
 
@@ -234,6 +247,30 @@ By supporting multiple concurrent intentions, \ac{BDI} agents can manage complex
 Yet, the underlying assumption is that all plans are known in advance, and the agent can select them based on the current context.
 %
 It may happen that a plan is not available for a given event and context, in which case the agent may fail to act, and the whole intention may remain unfulfilled.
+
+\section{\jakta{}: \jason{}-like Kotlin Agents}
+
+\jakta{}~\cite{JaktaSNCS2024} is an internal \ac{DSL} designed for implementing \ac{BDI} agents directly in Kotlin. 
+%
+Unlike traditional \ac{BDI} frameworks which rely on external \acp{DSL}, \jakta{} is built using Kotlin's native language features as an internal DSL.
+%
+This approach leverages Kotlin's expressive syntax and type system to provide a more integrated and type-safe environment for \ac{AoP}.
+
+\jakta{} includes a \ac{BDI} interpreter that is compliant with \agentspeak{}, enabling developers to define agents, beliefs, goals, plans, and actions as first-class Kotlin constructs.
+%
+It draws inspiration from \jason{}~\cite{ProgrammingMultiAgentSystems2007}, a widely used Java-based framework for \ac{BDI} agent programming based on an extended version of \agentspeak{}.
+%
+While \jason{} provides a solid foundation for developing multiagent systems, its external DSL approach requires developers to work with a separate language syntax and toolchain.
+%
+\jakta{} addresses this by embedding \ac{AoP} capabilities directly into Kotlin's syntax, allowing developers to benefit from Kotlin's modern language features such as null safety, coroutines, and functional programming constructs.
+%
+This internal DSL approach enables more seamless integration between agent logic and conventional programming constructs, reducing the cognitive overhead of context switching between different syntaxes.
+%
+Additionally, Kotlin's interoperability with Java ensures that \jakta{} maintains access to the extensive JVM ecosystem while providing a more contemporary development experience, by taking advantage of IDE features, debugging tools, and build systems.
+%
+The framework's design also facilitates the combination of \ac{AoP} with other programming paradigms within the same codebase, leading to more sophisticated and maintainable agent-based systems.
+%
+Due to these design advantages and its alignment with modern development practices, \jakta{} has been chosen for the development of the \ac{PGP} prototype.
 
 \section{Plan Generation in BDI Agents}\label{sec:plan-generation}
 
@@ -487,13 +524,9 @@ Provided that agents are equipped with the aforementioned \inlineAsl{generate\_p
 (*@$p_{genex}$ $\equiv$@*) -G : missing_plan_for(G) <- generate(G); G.
 \end{lstlisting}
 %
-This approach borrows \jason{}'s extended \agentspeak{} syntax~\cite{BordiniHW2007} for failure handling plans\footnotemark{} to express a plan (namely, $p_{genex}$) reacting to the failure event provoked by the absence of a plan for goal \inlineAsl{G}, to which the agent should react by generating a plan for it, and finally pursue goal \inlineAsl{G} one more time.
+This approach borrows \jason{}'s extended \agentspeak{} syntax~\cite{BordiniHW2007} for failure handling plans to express a plan (namely, $p_{genex}$) reacting to the failure event provoked by the absence of a plan for goal \inlineAsl{G}, to which the agent should react by generating a plan for it, and finally pursue goal \inlineAsl{G} one more time.
 %
 The underlying assumption here is that agents are equipped with the plan $p_{genex}$, as well as with the special belief \inlineAsl{missing\_plan\_for(G)}, whether plans are missing in the agent's plan library for goal \inlineAsl{G}.
-%
-\footnotetext{
-    \jason{} is an implementation of \agentspeak{} which extends the syntax in many ways, there including failure events of the form \inlineAsl{-G}, which occur when some plan for goal \inlineAsl{G} fails or none is available.
-}
 
 The reactive approach improves the on-demand approach by making the generation procedure automatic, and therefore implicit.
 %
@@ -688,6 +721,38 @@ Finally, there's a latency versus accuracy trade-off, especially in multistep ap
 This work aims at maximizing the exploitation of natural language, as done in related works that employ \acs{LLM} as a planner~\cite{Murugesan25a}, to achieve~\ref{syntax:prompt}, by enriching the \agentspeak{} syntax with natural language descriptions.
 %
 For requirement~\ref{syntax:response}, format restricting instructions are employed to nudge the LLM towards structured output by providing a detailed description of the expected response format as part of the prompt.
+%
+\Cref{lst:format-instructions} shows an example of this approach, used in the PGP prototype, to instruct the LLM to format its responses with a hybrid YAML and Prolog syntax.
+
+\begin{lstlisting}[
+    float=htbp,
+    basicstyle=\scriptsize\ttfamily,
+    breaklines=true,
+    label={lst:format-instructions},
+    captionpos=b,
+    caption={Fragment of the format restricting instructions that define the hybrid YAML and Prolog syntax that the LLM is expected to use to format its responses in the implemented PGP prototype.}
+]
+## Operation Types
+Operations must be prefixed with keywords:
+- `execute`: primitive actions that directly interact with environment (e.g., `execute move(north)`)
+- `achieve`: set new subgoal that triggers another plan (e.g., `achieve reach(rock)`)
+- `add`: add new belief to belief base (e.g., `add visited(current_location)`)
+- `remove`: remove existing belief (e.g., `remove obstacle(north)`)
+- `update`: modify existing belief (e.g., `update position(X, Y)`)
+
+Always format plans as:
+```yaml
+EVENT: achieve event to be pursued
+CONDITIONS:
+  - condition to be satisfied
+  - other conditions to be satisfied
+OPERATIONS:
+  - [execute|achieve|add|remove|update] operation to be performed
+  - [execute|achieve|add|remove|update] other operations to be performed
+```
+
+Separate multiple plans with `---`. Use `<none>` for empty conditions or operations.
+\end{lstlisting}
 
 \section{Writing Generative Agent Specifications}\label{sec:writing-generative-agent-specs}
 
@@ -708,6 +773,27 @@ For this reason, the encoding procedure (\S~\ref{sec:pgp-encoding}) is designed 
 Yet, descriptions cannot be automatically generated---as any automatic procedure may risk being inaccurate or incomplete w.r.t.\ the programmer's intent---and programmers would be better writing them directly.
 %
 Descriptions should be written in natural language and should explain the meaning of both the \emph{admissible} and \emph{actual} goals, beliefs, and actions each agent may have.
+%
+\Cref{lst:nl-hints} shows an example of application to document an admissible goal, using a syntax that will be detailed in~\cref{sec:generative-agent-spec}.
+
+\begin{lstlisting}[
+    float=htbp,
+    basicstyle=\scriptsize\ttfamily,
+    breaklines=true,
+    language=Kotlin,
+    label={lst:nl-hints},
+    captionpos=b,
+    caption={An example of how a description enriches an admissible goal with an explanation of its meaning, to the benefit of both the human programmer and the \ac{LLM}-based \ac{PGP}.}
+]
+ goals {
+    admissible {
+        +achieve("reach"("Object")).meaning {
+            "reach a situation where ${args[0]} is in the position of the agent" +
+                " (i.e. there_is(${args[0]}, here))"
+        }
+    }
+}
+\end{lstlisting}
 
 Accordingly, a \ac{PGP}-equipped \ac{BDI} agent requires agent programs to be written in a way that
 \begin{inlinelist}
@@ -794,27 +880,27 @@ In table~\ref{pgp-params} an outline of the configuration that the user can prov
 \begin{table}[htbp]
 \centering
 \begin{tabular}{|l|l|p{7cm}|}
-\hline
+\toprule
 \textbf{Parameter} & \textbf{Type} & \textbf{Description} \\
-\hline
+\midrule
 \texttt{model} & \texttt{String} & Specifies the language model to be used for plan generation (e.g., GPT-4, Claude, etc.) \\
-\hline
+\midrule
 \texttt{temperature} & \texttt{Double} & Controls the randomness of the generated output. Lower values produce more deterministic results, higher values increase creativity \\
-\hline
+\midrule
 \texttt{maxTokens} & \texttt{Int} & Maximum number of tokens that can be generated in the response, limiting the length of generated plans \\
-\hline
+\midrule
 \texttt{url} & \texttt{String} & The endpoint URL for the language model API service \\
-\hline
+\midrule
 \texttt{token} & \texttt{String} & Authentication token required to access the language model API \\
-\hline
+\midrule
 \texttt{requestTimeout} & \texttt{Duration} & Maximum time to wait for a complete API request-response cycle \\
-\hline
+\midrule
 \texttt{connectTimeout} & \texttt{Duration} & Maximum time to wait when establishing a connection to the API service \\
-\hline
+\midrule
 \texttt{socketTimeout} & \texttt{Duration} & Maximum time to wait for data transfer over an established connection \\
-\hline
+\midrule
 \texttt{contextFilter} & \texttt{ContextFilter} & Filter component that determines which contextual information should be included in the generation prompt \\
-\hline
+\midrule
 \texttt{promptBuilder} & \texttt{PromptBuilder} & Component responsible for constructing the prompt sent to the language model, including context formatting and instruction generation \\
 \bottomrule
 \end{tabular}
@@ -859,7 +945,7 @@ This goal encapsulates a request for plan generation, storing both the target go
 %
 When a \texttt{GeneratePlan} goal is encountered during the execution of an intention, it is processed by the \texttt{GenerationManager}.
 %
-The system first checks if a generation strategy is available - if not, it returns a failure feedback indicating that plan generation cannot proceed without a configured strategy.
+The system first checks if a generation strategy is available---if not, it returns a failure feedback indicating that plan generation cannot proceed without a configured strategy.
 %
 This design ensures that agents can operate with or without plan generation capabilities, providing backward compatibility with traditional BDI systems.
 
@@ -978,7 +1064,7 @@ The \texttt{GenerationProcessUpdater} manages a registry of generation processes
 %
 This underlying \\ \texttt{GenerationProcessRegistry} is implemented as a map, linking each goal generation request to its corresponding generation state.
 %
-The use of a registry potentially allows to handle long-running \acp{PGP}, including those involving \acp{LLM} that may require multiple interaction turns.
+The use of a registry potentially allows handling long-running \acp{PGP}, including those involving \acp{LLM} that may require multiple interaction turns.
 
 \section{Logging System}\label{sec:logging-system}
 
@@ -1126,7 +1212,7 @@ Its responsibilities include processing different template types (beliefs and go
 %
 \Cref{fig:parser-result} shows both the type of errors that can be accumulated by the parser and the kind of results it can return.
 %
-The final result aggregates successfully parsed plans, admissible beliefs, and admissible goals in the \texttt{NewResult} class, along with parsing errors, if there any, or returns an \texttt{EmptyResponse} if no valid content was extracted.
+The final result aggregates successfully parsed plans, admissible beliefs, and admissible goals in the \texttt{NewResult} class, along with parsing errors, if there are any, or returns an \texttt{EmptyResponse} if no valid content was extracted.
 
 \begin{figure}
     \centering
@@ -1199,6 +1285,7 @@ When implementing custom filters, the trade-off between information completeness
 Overly aggressive filtering may remove crucial information that could lead to better plans, while insufficient filtering may degrade performance without providing meaningful benefits.
 
 \lstinputlisting[
+    float=htbp,
     label={lst:default-filter},
     caption={Default context filter implementation that removes meta-plans and failure-handling plans to streamline the LLM context for plan generation.},
     language=Kotlin,
@@ -1241,6 +1328,7 @@ Providing both user and system \acp{DSL} reflects how \acp{LLM} differentiate be
 This separation of concerns improves code clarity, prevents accidental misuse of the two roles, and aligns with best practices in prompt engineering.
 
 \lstinputlisting[
+    float=htbp,
     label={lst:prompt-with-hints},
     caption={Example of a user prompt template, which is populated at runtime according to the state of the agent and the content of static files.},
     language=Kotlin,
@@ -1274,6 +1362,7 @@ Rather than replacing entire configuration blocks, individual parameters are ove
 This allows for fine-grained control where, for example, an agent might inherit most parameters from the MAS level while only modifying specific settings such as temperature or max tokens.
 
 \lstinputlisting[
+    float=htbp,
     label={lst:mas-level-gen-strat},
     caption={Example of a generation strategy declared at the MAS level.},
     language=Kotlin,
@@ -1283,6 +1372,7 @@ This allows for fine-grained control where, for example, an agent might inherit 
 ]{listings/mas-level-gen-strat.kt}
 
 \lstinputlisting[
+    float=htbp,
     label={lst:agent-level-gen-strat},
     caption={Example of a generation strategy declared at the agent level.},
     language=Kotlin,
@@ -1292,6 +1382,7 @@ This allows for fine-grained control where, for example, an agent might inherit 
 ]{listings/agent-level-gen-strat.kt}
 
 \lstinputlisting[
+    float=htbp,
     label={lst:plan-level-gen-strat},
     caption={Example of a generation strategy declared at the plan level.},
     language=Kotlin,
@@ -1317,6 +1408,7 @@ The strings are then exploited by the \ac{PGP} to generate the prompt for the \a
 An example of use of the new constructs is shown in~\cref{lst:hints-spec}.
 
 \lstinputlisting[
+    float=htbp,
     label={lst:hints-spec},
     caption={Example of a \jakta{} agent extended with natural-language descriptions},
     language=Kotlin,
@@ -1342,6 +1434,7 @@ When the agent needs to achieve the goal \texttt{print\_numbers(0, 10)}, it will
 The configured \ac{LLM} will receive the natural language description ``Print the numbers from 0 to 10'' along with the specific context and generate a concrete plan that implements the required functionality. 
 
 \lstinputlisting[
+    float=htbp,
     label={lst:on-demand-generation},
     caption={Example of a \jakta{} agent that will try to generate a plan to print the numbers from zero to ten using the provided generation strategy.},
     language=Kotlin,
@@ -1361,6 +1454,7 @@ These specialized events provide more granular insight into the environment's be
 Analogously, when creating custom actions, the \texttt{addFeedback} method from the \texttt{Action} interface enables the provision of detailed, domain-specific \texttt{ExecutionFeedback} log events that can provide richer diagnostic information of action outcomes beyond simple binary success or failure indicators.
 
 \lstinputlisting[
+    float=htbp,
     label={lst:custom-feedback-spec},
     caption={Implementation of the \texttt{move} action, which provides a more specific feedback than the default \texttt{GenericActionSuccess} when the action completes successfully.},
     language=Kotlin,
@@ -1421,7 +1515,7 @@ In the explorer robot domain, an agent acts as an explorer (\S~\ref{sec:explorer
 The \texttt{ExplorerRobot} agent, whose specification is shown in~\cref{lst:agent-spec}, is designed to achieve high-level goals such as reaching a target object (e.g., “home”). It declares a set of admissible goals and beliefs that are enhanced with natural language explanations.
 
 \lstinputlisting[
-    % float,
+    float=htbp,
     label={lst:agent-spec},
     caption={The \texttt{ExplorerRobot} agent as implemented in \jakta{}.},
     language=Kotlin,
@@ -1472,7 +1566,7 @@ there_is(box, north_east).
 \end{lstlisting}
 
 \lstinputlisting[
-    % float,
+    float=htbp,
     label={lst:env-spec},
     caption={Specification of the grid world environment in \jakta{}.},
     language=Kotlin,
@@ -1508,15 +1602,21 @@ To conduct the experiments, the OpenRouter's API is selected as the primary inte
 To assess the quality of generated plans, an automated evaluation procedure is devised based on the chosen APIs and evaluation metrics.
 %
 A DVC~\cite{ruslan_kuprieiev_2025_15646974} pipeline and \href{https://gradle.org/}{Gradle} tasks are used to automate the execution of a MAS for each experimental configuration to be tested and to store the results to a \href{https://dagshub.com/rbattistini/plan-generation-experiments}{remote server}.
+
+The G-Eval~\cite{liuGEvalNLGEvaluation2023} algorithm is used through the DeepEval~\cite{Ip_deepeval_2025} framework to evaluate a custom metric, the \textbf{Plan-Reference Alignment Score (\PRAS{})}.
 %
+The metric is introduced to compare generated plans against the human baseline across three key dimensions: quality of abstraction, generalizability, and adherence to BDI principles.
+%
+This evaluation approach is based on the LLM-as-Judge methodology~\cite{DBLP:journals/corr/abs-2412-05579}, which allows to systematically rate plan quality using criteria that would be difficult to formalize through traditional metrics alone.
+
 In order to have a reference ground truth for the evaluation, a human baseline is provided that represents the optimal plans to achieve the goal of reaching home, which are shown in~\cref{lst:human-baseline}.
 
 \lstinputlisting[
-    % float,
+    float=htbp,
     label={lst:human-baseline},
     caption={Set of baseline plans for the ExplorerRobot agent},
     language=Kotlin,
-    basicstyle=\footnotesize\ttfamily,
+    basicstyle=\scriptsize\ttfamily,
     captionpos=b,
     mathescape=false
 ]{listings/baselineplans.kt}
@@ -1529,7 +1629,7 @@ They are selected based on their state-of-the-art performance, as well as for th
 
 \subsection{Experiments' Parameters}\label{sec:generation-parameters}
 
-The only parameters that were explicitly set are the temperature and the max tokens.
+The only parameters that were explicitly set are the temperature, the max tokens and the prompt type.
 
 \paragraph{Temperature.}  The effect of temperature on plan generation was examined using three values: 0.1, 0.5, and 0.9. 
 %
@@ -1564,14 +1664,15 @@ Hints and remarks were considered separately to assess how much different types 
 \PC  & Plan Count               & Total number of generated plans. \\
 \CC  & Context Complexity       & Average number of beliefs per plan context. \\
 \PBC & Plan Body Complexity     & Average number of operations per plan body. \\
-\GR  & Generalization Count     & Number of generated plans using variables rather than constants. \\
-\RR  & Redundancy Amount        & Number of useless plans (e.g., not executable or subsumed). \\
+\GC  & Generalization Count     & Number of generated plans using variables rather than constants. \\
+\RR  & Redundancy Amount        & Number of useless plans (e.g., subsumed). \\
 \NGC & Novel Goal Count         & Number of newly-invented goals. \\
 \NBC & Novel Belief Count       & Number of newly-invented beliefs. \\
 \GSA & Goal Semantic Alignment  & Number of semantically-misaligned admissible goals. \\
 \BSA & Belief Semantic Alignment& Number of semantically-misaligned admissible beliefs. \\
 \TSR & Task Success Rate        & Percentage of experiments where the agent achieves the \inlineAsl{!reach(home)} goal. \\
 \GAT & Goal Achievement Time    & Average steps required to reach the goal in successful runs. \\
+\PRAS{} & Plan-Alignment Reference Score & Alignment of the generated plans with the human reference \\
 \bottomrule
 \end{tabularx}
 \caption{Evaluation metrics for generated plans.}
@@ -1580,17 +1681,9 @@ Hints and remarks were considered separately to assess how much different types 
 
 To evaluate the quality of generated plans, the metrics shown in \cref{tab:metrics} are employed.
 %
-Among these metrics, \GR{} and \TSR{} should be maximized (higher values are better), while \RR{}, \GSA{}, \BSA{}, \GAT{} should be minimized (lower values are better).
+Among these metrics, \GC{} and \TSR{} should be maximized (higher values are better), while \RR{}, \GSA{}, \BSA{}, \GAT{} should be minimized (lower values are better).
 %
 The remaining metrics (\PC{}, \CC{}, \PBC{}, \NGC{}, and \NBC{}) have no clear optimization direction, yet they provide valuable comparative insights, with both extremely low and high values potentially indicating issues.
-
-Additionally, to establish a comprehensive evaluation metric for plan quality, the \textbf{Plan-Reference Alignment Score (\PRAS{})} metric is introduced, to compare generated plans against the human baseline.
-%
-For this evaluation, a \ac{LLM} is employed as an explicit judge~\cite{DBLP:journals/corr/abs-2412-05579} to assess the generated plans across three key dimensions: quality of abstraction, generalizability, and adherence to BDI principles. 
-%
-The \ac{LLM} judge compares these generated plans against reference implementations to provide systematic evaluation---the prompt employed for the judge is shown in~\cref{lst:llm-judge-prompt}.
-%
-This \ac{LLM}-as-judge methodology allows to systematically rate plan quality using criteria that would be difficult to formalize through traditional metrics alone.
 %
 \PRAS{} tends to one when the generated plans are similar to the reference ones, to zero when they are completely different.
 
@@ -1614,25 +1707,345 @@ This \ac{LLM}-as-judge methodology allows to systematically rate plan quality us
 
 Each of the four chosen \acp{LLM} was queried ten times to account for the stochastic nature of \ac{LLM} responses, for each of the three prompting configurations and for each of the three temperature values, yielding three hundred sixty total experimental runs.
 
-The average amount of input tokens was 995, with a min of 808 and a max of 1196.
+The average amount of input tokens is 995, with a min of 808 and a max of 1196.
 %
-The variability is due to presence of instances where multiple \acp{PGP} are invoked, so the total count is not always the number of tokens of the initial input prompt.
+The variability is due to presence of instances where multiple \acp{PGP} are invoked, so the total count is not always equal to the number of tokens of the initial input prompt, which has 1041 tokens.
 %
 The average amount of output tokens is 223, with a min of 77 and a max of 553.
 %
-The average latency of the responses from OpenRouter was of 1471 ms, with a min of 288 ms and a max of 6120 ms.
+For comparison, the human reference is of 100 tokens.
 %
-The cost to run the experiments was approximately of one USD.
+The average latency of the responses from OpenRouter is of 1471 milliseconds, with a min of 288 milliseconds and a max of 6120 milliseconds.
 %
-Note that Deepseek was offered free of charge.
+The cost to run the experiments was approximately of one USD, not considering Deepseek since it was offered free of charge.
 
-Only in eight instances more than one PGP was invoked, and it never resulted in plans that reached home.
+Only in eight instances more than one \ac{PGP} is invoked, and it never results in plans that reach home.
 %
-In this subset of experiments the PGP was called two times on average, with a single outlier in which the PGP was called nine times.
+In this subset of experiments the \ac{PGP} is called two times on average, with a single outlier in which the \ac{PGP} is called nine times.
 %
-The rest of analysis will omit instances where the PGP was invoked more than one time.
+All subsequent tables and figures exclude instances where the \ac{PGP} was invoked more than once.
 
-Work in progress.
+The analysis is structured as follows: \cref{sec:pgp-prompt} shows how the \acp{LLM} were prompted, \cref{sec:pgp-responses} shows some example responses and \cref{sec:metrics-analysis} provides a detailed breakdown of the outcomes.
+
+\subsection{Example PGP Prompt}\label{sec:pgp-prompt}
+
+The explorer robot application has been tested with a prompt that defines content both for the system and user roles.
+%
+\Cref{lst:system-prompt} shows the system prompt sent in all the \ac{PGP} invocations and~\cref{lst:user-prompt} shows the user prompt with both hints and remarks included.
+
+\lstinputlisting[
+    float=htbp,
+    label={lst:system-prompt},
+    caption={The system prompt used by the robot explorer application.},
+    basicstyle=\scriptsize\ttfamily,
+    captionpos=b,
+    mathescape=false
+]{listings/prompt-system.md}
+
+\lstinputlisting[
+    float=htbp,
+    label={lst:user-prompt},
+    caption={The user prompt used by the robot explorer application.},
+    basicstyle=\scriptsize\ttfamily,
+    captionpos=b,
+    mathescape=false
+]{listings/prompt-user.md}
+
+\subsection{Example PGP Responses}\label{sec:pgp-responses}
+
+In~\cref{lst:claude-response}, \cref{lst:deepseek-response}, \cref{lst:gpt-response} and \cref{lst:gemini-response} are shown example responses for each of the tested models.
+%
+The responses are obtained by extracting the raw message content and are not preprocessed in any way. 
+
+\lstinputlisting[
+    float=htbp,
+    label={lst:claude-response},
+    caption={Example response given by Claude Sonnet 4 (beautiful-volhard). This is one of the few successful PGP invocations which use a prompt with no hints or remarks.},
+    basicstyle=\scriptsize\ttfamily,
+    captionpos=b,
+    mathescape=false
+]{listings/generation_result_beautiful_volhard.txt}
+
+
+\lstinputlisting[
+    float=htbp,
+    label={lst:deepseek-response},
+    caption={Example response given by Deepseek V3 Chat (stoic-rhodes).},
+    basicstyle=\scriptsize\ttfamily,
+    captionpos=b,
+    mathescape=false
+]{listings/generation_result_stoic_rhodes.txt}
+
+\lstinputlisting[
+    float=htbp,
+    label={lst:gpt-response},
+    caption={Example response given by GPT 4.1 (stupefied-lewin).},
+    basicstyle=\scriptsize\ttfamily,
+    captionpos=b,
+    mathescape=false
+]{listings/generation_result_stupefied_lewin.txt}
+
+\lstinputlisting[
+    float=htbp,
+    label={lst:gemini-response},
+    caption={Example response by Gemini 2.5 Flash (frosty-kare). This is the response that got the highest score by the LLM judge, which coincidentally was Gemini 2.5 Flash itself, and was one of the few answers the model provided that were successful.},
+    basicstyle=\scriptsize\ttfamily,
+    captionpos=b,
+    mathescape=false
+]{listings/generation_result_frosty_kare.txt}
+
+\subsection{Detailed Metrics' Analysis}\label{sec:metrics-analysis}
+
+This section examines the preliminary results obtained from the experimental evaluation, focusing on the specific metrics and their implications for \ac{PGP} performance.
+%
+While these findings provide valuable insights into model behavior and structural plan characteristics, their broader applicability remains limited due to the constrained experimental scope, the limited set of models examined and the limited number of samples.
+%
+Additional experimentation across diverse model architectures and domains will be necessary to establish the generalizability of these observations and to develop a more robust understanding of the factors influencing the \ac{PGP} performance.
+
+\subsubsection{Grouping by Prompt and Model}
+
+\Cref{tab:byPromptAndModel}, \cref{fig:prompt-stats} and~\cref{fig:prompt-stats-cont} present an evaluation of the defined metrics for each of the chosen models under three different prompting conditions.
+%
+The performance varies significantly according to the type of prompt employed, indicating sensitivity to prompt engineering.
+%
+In particular the best performance in terms of \TSR{} is achieved when \acp{LLM} are given the most rich context, while they seem to struggle to generate a successful answer at all if no kind of documentation is given.
+%
+This suggests that, when Generative \ac{BDI} agents are used, the role of the programmer in providing a natural language interpretation of the domain concepts expressed through beliefs, goals and actions is critical.
+
+\subsubsection{Grouping by Temperature and Model}
+
+\Cref{tab:byTempAndModel}, \cref{fig:temp-stats} and~\cref{fig:temp-stats-cont} show how the value of the metrics change as the temperature varies.
+%
+Each model exhibits a varying sensitivity to the temperature, responding optimally under different configurations.
+%
+Claude has a low \TSR{} when operating at low temperature settings (0.1).
+%
+Both Claude and Gemini achieve better results when configured with moderate temperature values (0.5), suggesting they benefit from an approach that balances determinism with creative outputs.
+%
+Deepseek shows robust performance across both low and moderate temperature settings, which might imply greater stability across different parameter ranges. 
+%
+In contrast, GPT performs most effectively when configured with a low temperature.
+%
+These findings suggest that optimal temperature selection is model-dependent, with some architectures requiring more randomness to achieve peak performance while others excel under more constrained conditions.
+
+\subsubsection{Grouping by Temperature, Prompt Type and Model}
+
+\Cref{tab:byTempPromptAndModel} provides an overview of the best performing combinations of parameters considering both the temperature and the prompt type.
+%
+GPT 4.1 and Deepseek report the highest \TSR{} score, both achieving a perfect result with a temperature of 0.1 and by providing both hints and remarks in the prompt.
+%
+However, while Deepseek maintains perfect performance even at temperature 0.5, GPT 4.1 shows significant degradation at this setting, dropping to a \TSR{} of 70.
+%
+When prompts lack remarks, both top-performing models experience notable drops of their score, though they still maintain a relatively high \TSR{} of around 90. 
+%
+This suggests that contextual information plays a crucial role in their effectiveness.
+
+Claude stands out as the only model capable of achieving a success when no hints are provided, albeit with modest \TSR{} values of around 10, which might imply that is the most robust to information scarcity.
+%
+It's interesting to note that only with higher temperature values (0,5 and 0,9) the model achieves those successes, suggesting that when there is too little information, more ``creative exploration'' helps in finding a valid solution to ambiguous or under-specified problems.
+%
+This is just a speculation since more experimental runs would be needed to assess whether this is a random fluctuation or a pattern, given the very low \TSR{}.
+%
+Nevertheless, this observation might inform future iterations of the \ac{PGP}, where dynamic temperature adjustment could emulate divergent and convergent thinking patterns. 
+%
+A higher value might be used during the initial exploration or when the \ac{PGP} gets stuck, while a lower one can be used to focus efforts on refining viable solutions.
+
+Gemini is the lowest performing model, showing instability at both temperature extremes and achieving only occasional successes when working with the most information-rich variant of the prompt.
+
+\subsubsection{Results considering only successful PGP invocations}
+
+The results in~\cref{tab:overallSuccessful} consider only successful \ac{PGP} invocations. 
+%
+GPT 4.1 and Gemini demonstrate the highest generalization count (\GC{} scores of 4.21 and 4.67 respectively), indicating their enhanced ability to develop flexible, variable-based plans instead of rigid, hard-coded approaches.
+%
+Despite Gemini's strong generalization performance, it struggles to convert this advantage into reliable task completion (see~\cref{tab:byTempPromptAndModel}), unlike GPT 4.1 which maintains consistent success rates. 
+%
+This pattern suggests that plan generality doesn't necessarily guarantee execution effectiveness.
+%
+The reverse relationship also appears true---execution success doesn't ensure plan reusability.
+%
+Deepseek exemplifies this disconnect, achieving high \TSR{} while reporting the lowest generalization scores. 
+%
+This indicates that models can excel at completing specific tasks without developing transferable solution strategies.
+%
+Furthermore, both GPT and Gemini exhibit high \GAT{} scores, whereas Deepseek is the only model that consistently approaches human-level performance (\GAT{} 33), with a score of 37.
+%
+This observation suggests that highly generalized solutions occasionally sacrifice efficiency compared to task-specific approaches.
+
+For what concerns the plan complexity metrics, Claude, and in greater measure Deepseek, exhibit a distinct pattern: they generate complex plan bodies (resp. \PBC{} of 1.67 and 2.22) while maintaining moderately complex plan contexts (resp. \CC{} of 1.41 and 1.33).
+%
+This complexity likely stems from their low generalization capability (resp. \GC{} of 0.57 and 0.08), as avoiding variables naturally results in more verbose and repetitive code structures where similar operations are explicitly written out rather than abstracted into reusable components.
+%
+In contrast, GPT 4.1 demonstrates the inverse pattern, producing the most complex contexts (\CC{} 1.96) while generating less complex bodies (\PBC{} 1.53). 
+%
+These results seem to align with its higher generalization performance (\GC{} 4.21), since the model handles diverse contingencies within the context and generates short bodies through the use of variables, representing the opposite approach to the strategy of Deepseek and Claude.
+%
+Gemini showed the highest generalization capability, with a \GC{} of 4.67.
+
+Across all models, redundancy rates remained low, indicating that generated plans rarely subsumed one another.
+%
+This suggests that while models may vary in their generalization and complexity strategies, they consistently produce distinct solutions rather than generating overlapping or redundant plans.
+
+Regarding goal and belief invention, Deepseek shows a marked tendency to invent new beliefs, whereas GPT leans more toward inventing goals.
+%
+Claude has the lowest combined score, indicating the least amount of invention overall.
+%
+That said, the overall \NGC{} and \NBC{} scores are quite low, suggesting that the models generally understood that no new goals or beliefs were necessary for the given domain.
+
+Considering the semantic alignment metrics, the \BSA{} is relatively high, especially for Deepseek and Gemini.
+%
+This is often due to the models introducing new beliefs that are ultimately unused.
+%
+In contrast, the \GSA{} is quite low.
+%
+This suggests that when new goals were invented, especially by GPT-4.1 and Gemini, they were effectively integrated and utilized.
+%
+Overall, the models appear to have followed the constraint of not inventing goals or beliefs that already existed in the domain, showing good semantic alignment in relation to the human reference.
+
+\subsubsection{Plan-Reference Alignment Score}
+
+The data previously presented in the tables reveals substantial divergence between the generated plans and the baseline reference. 
+%
+This divergence manifests both in the structure and complexity of the generated plans: the plan counts are consistently higher and both the context and body complexity are higher compared to the baseline.
+
+The \PRAS{} evaluation scores in~\cref{fig:judge-eval} seems to reinforce this structural misalignment, due to the uniformly low scores across all models.
+%
+Notably, Gemini, the model that obtained the highest \PRAS{} score, is also the one with the lowest \TSR{}.
+
+\begin{table}[htbp]
+    \centering
+    \footnotesize
+    \begin{tabular}{l|c|ccccccccc|c}%
+        \toprule
+        \textbf{Model} & \textbf{PT} & \PC{} & \CC{} & \PBC{} & \GC{} & \RR{} & \NGC{} & \NBC{} & \GSA{} & \BSA{} & \TSR{} \\  
+        \midrule
+        Claude & NH & 5.17 & 1.88 & 1.52 & 3.86 & 0.00 & 2.21 & 1.21 & 0.41 & 1.76 & 6.90 \\
+        Claude & H & 5.14 & 1.82 & 1.27 & 2.00 & 0.00 & 1.90 & 0.07 & 0.00 & 2.00 & 0.00 \\
+        Claude & HR & 3.41 & 1.40 & 1.61 & 0.03 & 0.00 & 0.03 & 0.00 & 0.38 & 1.72 & 65.52 \\
+        Deepseek & NH & 3.64 & 1.86 & 2.01 & 0.50 & 0.00 & 1.00 & 1.25 & 0.25 & 2.29 & 0.00 \\
+        Deepseek & H & 3.54 & 1.85 & 1.97 & 0.00 & 0.00 & 0.25 & 1.21 & 0.25 & 3.36 & 50.00 \\
+        Deepseek & HR & 3.57 & 1.40 & 2.08 & 0.30 & 0.00 & 0.37 & 1.03 & 0.47 & 3.47 & 80.00 \\
+        GPT 4.1 & NH & 3.53 & 2.65 & 1.91 & 3.53 & 0.00 & 1.20 & 1.03 & 0.37 & 1.87 & 0.00 \\
+        GPT 4.1 & H & 4.23 & 2.06 & 1.71 & 4.23 & 0.03 & 1.70 & 0.90 & 0.13 & 1.13 & 63.33 \\
+        GPT 4.1 & HR & 4.47 & 2.00 & 1.36 & 4.37 & 0.00 & 1.57 & 0.07 & 0.00 & 0.57 & 80.00 \\
+        Gemini & NH & 3.14 & 1.63 & 1.49 & 3.14 & 0.03 & 0.17 & 0.31 & 0.31 & 2.17 & 0.00 \\
+        Gemini & H & 4.82 & 1.48 & 1.53 & 4.79 & 0.64 & 0.71 & 1.79 & 0.54 & 2.86 & 0.00 \\
+        Gemini & HR & 4.04 & 1.13 & 1.13 & 3.96 & 0.00 & 0.86 & 0.18 & 0.18 & 1.75 & 10.71 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Results grouped by model and prompt type, with metrics averaged. \textbf{PT} stands for the parameter ``Prompt Type''. \textbf{NH} stands for ``NoHints'', \textbf{H} for ``WithHints'', and \textbf{HR} for ``WithHintsAndRemarks''.}
+    \label{tab:byPromptAndModel}
+\end{table}
+
+\begin{table}[htbp]
+    \centering
+    \footnotesize
+    \begin{tabular}{l|c|ccccccccc|c}%
+        \toprule
+        \textbf{Model} & \textbf{T} & \PC{} & \CC{} & \PBC{} & \GC{} & \RR{} & \NGC{} & \NBC{} & \GSA{} & \BSA{} & \TSR{} \\  
+        \midrule
+        Claude & 0.1 & 4.80 & 1.74 & 1.37 & 2.00 & 0.00 & 1.43 & 0.40 & 0.43 & 1.93 & 16.67 \\
+        Claude & 0.5 & 4.44 & 1.69 & 1.51 & 2.04 & 0.00 & 1.41 & 0.33 & 0.11 & 1.56 & 29.63 \\
+        Claude & 0.9 & 4.47 & 1.67 & 1.52 & 1.87 & 0.00 & 1.30 & 0.53 & 0.23 & 1.97 & 26.67 \\
+        Deepseek & 0.1 & 3.52 & 1.60 & 2.15 & 0.14 & 0.00 & 0.34 & 1.14 & 0.10 & 3.48 & 62.07 \\
+        Deepseek & 0.5 & 3.46 & 1.60 & 2.07 & 0.29 & 0.00 & 0.57 & 1.25 & 0.39 & 3.14 & 46.43 \\
+        Deepseek & 0.9 & 3.76 & 1.89 & 1.86 & 0.38 & 0.00 & 0.69 & 1.10 & 0.48 & 2.52 & 24.14 \\
+        GPT 4.1 & 0.1 & 3.77 & 2.25 & 1.70 & 3.77 & 0.00 & 1.50 & 0.50 & 0.20 & 0.93 & 63.33 \\
+        GPT 4.1 & 0.5 & 4.17 & 2.15 & 1.61 & 4.13 & 0.00 & 1.53 & 0.50 & 0.13 & 1.10 & 43.33 \\
+        GPT 4.1 & 0.9 & 4.30 & 2.32 & 1.66 & 4.23 & 0.03 & 1.43 & 1.00 & 0.17 & 1.53 & 36.67 \\
+        Gemini & 0.1 & 4.10 & 1.35 & 1.20 & 4.07 & 0.40 & 0.67 & 1.33 & 0.33 & 3.00 & 0.00 \\
+        Gemini & 0.5 & 4.21 & 1.46 & 1.47 & 4.14 & 0.21 & 0.52 & 0.41 & 0.24 & 1.76 & 10.34 \\
+        Gemini & 0.9 & 3.62 & 1.44 & 1.50 & 3.62 & 0.04 & 0.54 & 0.46 & 0.46 & 1.96 & 0.00 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Results grouped by model and temperature, with metrics averaged. \textbf{T} stands for the parameter ``Temperature''.}
+    \label{tab:byTempAndModel}
+\end{table}
+
+\begin{table}[htbp]
+    \centering
+    \footnotesize
+    \begin{tabular}{l|cc|c}%
+        \toprule
+        \textbf{Model} & \textbf{Prompt Type} & \textbf{Temperature} & \TSR{} \\  
+        \midrule
+        GPT 4.1 & Hints and Remarks & 0.1 & 100.00 \\
+        Deepseek & Hints and Remarks & 0.1 & 100.00 \\
+        Deepseek & Hints and Remarks & 0.5 & 100.00 \\
+        GPT 4.1 & Only Hints & 0.1 & 90.00 \\
+        Deepseek & Only Hints & 0.1 & 88.89 \\
+        Claude & Hints and Remarks & 0.5 & 77.78 \\
+        GPT 4.1 & Hints and Remarks & 0.9 & 70.00 \\
+        GPT 4.1 & Hints and Remarks & 0.5 & 70.00 \\
+        Claude & Hints and Remarks & 0.9 & 70.00 \\
+        GPT 4.1 & Only Hints & 0.5 & 60.00 \\
+        Claude & Hints and Remarks & 0.1 & 50.00 \\
+        GPT 4.1 & Only Hints & 0.9 & 40.00 \\
+        Deepseek & Hints and Remarks & 0.9 & 40.00 \\
+        Gemini & Hints and Remarks & 0.5 & 33.33 \\
+        Deepseek & Only Hints & 0.9 & 33.33 \\
+        Deepseek & Only Hints & 0.5 & 30.00 \\
+        Claude & No Hints & 0.5 & 11.11 \\
+        Claude & No Hints & 0.9 & 10.00 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Results grouped by prompt type, temperature and model, sorted by task success rate and with metrics averaged. Entries with a \TSR{} of zero were omitted.}
+    \label{tab:byTempPromptAndModel}
+\end{table}
+
+\begin{table}[htbp]
+    \centering
+    \footnotesize
+    \begin{tabular}{l|ccccccccc|c}%
+        \toprule
+        \textbf{Model} & \PC{} & \CC{} & \PBC{} & \GC{} & \RR{} & \NGC{} & \NBC{} & \GSA{} & \BSA{} & \GAT{} \\  
+        \midrule
+        Deepseek & 3.50 & 1.41 & 2.22 & 0.08 & 0.00 & 0.21 & 1.11 & 0.29 & 3.79 & 37.71 \\
+        Claude & 3.38 & 1.33 & 1.67 & 0.57 & 0.00 & 0.38 & 0.29 & 0.05 & 1.10 & 247.52 \\
+        Gemini & 5.33 & 1.17 & 1.31 & 4.67 & 0.00 & 1.33 & 0.33 & 0.33 & 2.67 & 506.33 \\
+        GPT 4.1 & 4.21 & 1.96 & 1.53 & 4.21 & 0.00 & 1.60 & 0.42 & 0.02 & 0.70 & 1033.16 \\
+        \midrule
+        Optimal & 3.00 & 1.00 & 1.30 & 3.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 33.00 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Results grouped by model and averaged across all metrics, considering only successful \ac{PGP} executions.}
+    \label{tab:overallSuccessful}
+\end{table}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.75\textwidth]{figures/judge-eval.pdf}
+    \caption{The average \PRAS{} score for each model was calculated by sampling up to five PGP results from the set of successful PGP invocations.}
+    \label{fig:judge-eval}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/prompt-stats.pdf}
+    \caption{Bar plots showing \PC{}, \CC{}, \PBC{}, \GC{}, \RR{}, \NGC{}, \NBC{} and \GSA{} scores for each model, with a facet for each prompt type tested.}
+    \label{fig:prompt-stats}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/temperature-stats.pdf}
+    \caption{Bar plots showing \PC{}, \CC{}, \PBC{}, \GC{}, \RR{}, \NGC{}, \NBC{} and \GSA{} scores for each model, with a facet for each value of temperature tested.}
+    \label{fig:temp-stats}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/prompt-stats2.pdf}
+    \caption{\BSA{} and \TSR{} scores for each model, with a facet for each prompt type tested.}
+    \label{fig:prompt-stats-cont}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.95\textwidth]{figures/temperature-stats2.pdf}
+    \caption{\BSA{} and \TSR{} scores for each model, with a facet for each value of temperature tested.}
+    \label{fig:temp-stats-cont}
+\end{figure}
 
 \chapter{Conclusion}\label{chap:conclusion}
 
@@ -1716,23 +2129,23 @@ The sense-reason-act cycle of a BDI agent  could be further decomposed into plug
 %
 This approach would enable users to define in a declarative way how an agent's cognitive cycle is composed as part of its specification, e.g.\ what component to use for plan selection or for running intentions.
 %
-This modular architecture would make it easier to separate all plan generation functions from the BDI engine.
+Such a modular architecture would make it easier to separate all plan generation functions from the BDI engine.
 %
-This means plan generation could be integrated by adjusting the deliberation phase to handle cases where no plan is available and enhancing the action phase to manage \texttt{GeneratePlan} and \texttt{TrackGoalExecution} goals.
+Plan generation could be integrated by adjusting the deliberation phase to handle cases where no plan is available and enhancing the action phase to manage \texttt{GeneratePlan} and \texttt{TrackGoalExecution} goals.
 
 \paragraph{Logging System.} The current logging implementation is tightly coupled with the BDI engine. An event-driven architecture can be implemented, by leveraging Kotlin Flows, to define a separate logging module that registers as a listener for events emitted by the BDI engine.
 
 \subsection{Model Context Protocol Integration}\label{sec:mcp-integration}
 
 A promising direction for enhancing \ac{LLM}-augmented \ac{BDI} agent systems involves leveraging \ac{MCP}, an open standard that enables to build connections between data sources and GenAI-powered applications.
-
+%
 Unlike the current implementation of the \ac{PGP}, which requires custom interfaces for each external tool or data source the BDI agent accesses---such as the logic to retrieve the agent's context---\ac{MCP} provides a standardized, reusable mechanism to integrate diverse components.
-
+%
 \ac{MCP} facilitates the construction of flexible, composable pipelines that orchestrate retrieval, transformation, and reasoning components. 
 %
 This enables more sophisticated plan-generation workflows, where the \ac{LLM} can draw from heterogeneous sources such as knowledge graphs, databases, reasoning tools, or other APIs.
 
-An potential application of this approach is to integrate with a \ac{MCP} server that performs \ac{RAG}. 
+A potential application of this approach is to integrate with a \ac{MCP} server that performs \ac{RAG}. 
 %
 This can help reduce the size of the \ac{LLM} prompt, which in turn improves inference times and reduces token consumption. 
 %
@@ -1760,7 +2173,7 @@ Using \acp{SLM} instead of large-scale \acp{LLM} also offers notable advantages 
 
 Future developments could explore the incorporation of artifacts---and more specifically, cognitional artifacts---as a means to further structure the interaction between generative \ac{BDI} agents and the environment.
 
-Artifacts in the \aaa{} are computational entities designed to be used by agents, exposing functionality through a well-defined \textit{usage interface}, and optionally enriched with \textit{function descriptions} and \textit{operating instructions}.
+Artifacts in the \aaa{}~\cite{omiciniArtifactsAAMetamodel2008} are computational entities designed to be used by agents, exposing functionality through a well-defined \textit{usage interface}, and optionally enriched with \textit{function descriptions} and \textit{operating instructions}.
 %
 These features make artifacts naturally compatible with \acp{LLM}, as they embody a set of properties increasingly characteristic of \ac{LLM}-native software development.
 
@@ -1777,16 +2190,6 @@ Cognitional artifacts---by design---already promote this pattern, and could serv
 As such, a promising future direction is the development of artifact-based infrastructures in which \acp{LLM} reason over available artifacts via their function descriptions, generate plans informed by artifact operating instructions, and execute them through artifact usage interfaces.
 
 This would also support a more declarative, open-ended, and cognitively rich model of agent behavior, aligning with the \textit{Agens Faber} vision, where agent intelligence includes the capacity to understand, use, and even construct new artifacts.
-
-\chapter*{Acknowledgements}
-
-I would like to thank my supervisor Giovanni Ciatto and cosupervisor Gianluca Aguzzi, for their guidance and support throughout this thesis.
-%
-I am also thankful to the doctoral candidates Martina Baiardi and Samuele Burattini for their suggestions and feedback, which helped shape the research direction.
-%
-Additional thanks go to Professor Alessandro Ricci for his insightful input during our group meetings.
-
-Last but not least, I want to thank my family for their support, patience, and encouragement throughout this master's program.
 
 %----------------------------------------------------------------------------------------
 % BIBLIOGRAPHY

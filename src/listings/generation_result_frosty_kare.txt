@@ -1,0 +1,52 @@
+```yaml
+EVENT: achieve reach(Object)
+CONDITIONS:
+  - there_is(Object, here)
+OPERATIONS:
+  - <none>
+---
+EVENT: achieve reach(Object)
+CONDITIONS:
+  - NOT there_is(Object, here)
+  - NOT there_is(Object, Direction)
+OPERATIONS:
+  - achieve explore()
+  - achieve reach(Object)
+---
+EVENT: achieve reach(Object)
+CONDITIONS:
+  - NOT there_is(Object, here)
+  - there_is(Object, Direction)
+  - direction(Direction)
+OPERATIONS:
+  - achieve move_towards(Direction)
+  - achieve reach(Object)
+---
+EVENT: achieve move_towards(Direction)
+CONDITIONS:
+  - direction(Direction)
+  - free(Direction)
+OPERATIONS:
+  - execute move(Direction)
+---
+EVENT: achieve move_towards(Direction)
+CONDITIONS:
+  - direction(Direction)
+  - obstacle(Direction)
+OPERATIONS:
+  - execute fail()
+---
+EVENT: achieve explore()
+CONDITIONS:
+  - <none>
+OPERATIONS:
+  - execute getDirectionToMove(Direction)
+  - achieve move_towards(Direction)
+```
+
+```yaml
+- goal: `achieve explore()`
+  purpose: find new areas to search for objects
+- goal: `achieve move_towards(Direction)`
+  purpose: move in a specific direction if possible
+```

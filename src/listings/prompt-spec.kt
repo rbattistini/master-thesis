@@ -38,13 +38,6 @@ user("UserPromptWithHints") { ctx ->
                     formatAsBulletList(it, actionsFormatter::format)
                 }
             }
-            if (withRemarks) {
-                section("Remarks") {
-                    fromFormatter(ctx.remarks) { r ->
-                        formatAsBulletList(r) { it.value }
-                    }
-                }
-            }
         }
         section("Expected outcome") {
             val formattedGoal = goalFormatter.format(ctx.initialGoal.goal)

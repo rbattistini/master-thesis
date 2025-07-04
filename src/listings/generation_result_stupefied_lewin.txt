@@ -1,0 +1,47 @@
+```yaml
+EVENT: achieve reach(X)
+CONDITIONS:
+  - object(X)
+  - not there_is(X, here)
+OPERATIONS:
+  - achieve explore_for(X)
+---
+EVENT: achieve explore_for(X)
+CONDITIONS:
+  - object(X)
+  - not there_is(X, D)
+OPERATIONS:
+  - execute getDirectionToMove(D)
+  - execute move(D)
+  - achieve explore_for(X)
+---
+EVENT: achieve explore_for(X)
+CONDITIONS:
+  - object(X)
+  - there_is(X, D)
+OPERATIONS:
+  - achieve approach(X, D)
+---
+EVENT: achieve approach(X, D)
+CONDITIONS:
+  - object(X)
+  - direction(D)
+  - there_is(X, D)
+  - not there_is(X, here)
+OPERATIONS:
+  - execute move(D)
+  - achieve reach(X)
+---
+EVENT: achieve reach(X)
+CONDITIONS:
+  - object(X)
+  - there_is(X, here)
+OPERATIONS:
+  - <none>
+```
+```yaml
+- goal: `explore_for(X)`
+  purpose: actively search for the location of object X when its location is unknown
+- goal: `approach(X, D)`
+  purpose: move towards object X in direction D when X is adjacent but not yet reached
+```

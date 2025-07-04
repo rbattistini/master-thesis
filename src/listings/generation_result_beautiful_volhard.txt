@@ -1,0 +1,35 @@
+```yaml
+EVENT: achieve reach(home)
+CONDITIONS:
+  - there_is(home, here)
+OPERATIONS:
+  - <none>
+```
+
+---
+
+```yaml
+EVENT: achieve reach(home)
+CONDITIONS:
+  - there_is(home, Direction)
+  - direction(Direction)
+OPERATIONS:
+  - execute getDirectionToMove(Direction)
+  - execute move(Direction)
+```
+
+---
+
+```yaml
+EVENT: achieve reach(home)
+CONDITIONS:
+  - <none>
+OPERATIONS:
+  - execute getDirectionToMove(Direction)
+  - execute move(Direction)
+  - achieve reach(home)
+```
+
+```yaml
+- <none>
+```

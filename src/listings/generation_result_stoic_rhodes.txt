@@ -1,0 +1,42 @@
+```yaml
+EVENT: achieve reach(home)
+CONDITIONS:
+  - there_is(home, here)
+OPERATIONS:
+  - execute stop()
+---
+
+EVENT: achieve reach(home)
+CONDITIONS:
+  - there_is(home, Direction)
+  - free(Direction)
+OPERATIONS:
+  - execute move(Direction)
+  - achieve reach(home)
+---
+
+EVENT: achieve reach(home)
+CONDITIONS:
+  - there_is(home, Direction)
+  - obstacle(Direction)
+OPERATIONS:
+  - execute getDirectionToMove(NewDirection)
+  - execute move(NewDirection)
+  - achieve reach(home)
+---
+
+EVENT: achieve reach(home)
+CONDITIONS:
+  - <none>
+OPERATIONS:
+  - execute getDirectionToMove(Direction)
+  - execute move(Direction)
+  - achieve reach(home)
+```
+
+```yaml
+- goal: `explore()`
+  purpose: explore the environment to find the home object when its location is unknown
+- belief: `visited(Location)`
+  purpose: indicates that the agent has already visited this location
+```
